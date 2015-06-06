@@ -2,6 +2,7 @@ package com.example.amado.bitdate;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,8 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ChoosingFragment extends android.app.Fragment implements UserDataSource.UserDataCallbacks {
-
+public class ChoosingFragment extends Fragment implements UserDataSource.UserDataCallbacks, CardStackContainer.swipeCallbacks {
+    private static final String TAG = "ChoosingFragment";
     private CardStackContainer mCardStack;
     private List<User> mUsers;
     private CardAdapter mCardAdapter;
@@ -34,6 +35,7 @@ public class ChoosingFragment extends android.app.Fragment implements UserDataSo
         mUsers = new ArrayList<>();
         mCardAdapter = new CardAdapter(getActivity(), mUsers);
         mCardStack.setAdapter(mCardAdapter);
+        mCardStack.setSwipeCallbacks(this);
         ImageButton nahButton = (ImageButton)v.findViewById(R.id.nah_button);
         nahButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,5 +58,15 @@ public class ChoosingFragment extends android.app.Fragment implements UserDataSo
     public void onUsersFetched(List<User> users) {
       mUsers.addAll(users);
         mCardAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSwipeRight(User user) {
+        ActionDataSource.saveUserLiked(user.getId());
+    }
+
+    @Override
+    public void onSwipeLeft(User user) {
+       ActionDataSource.saveUserSkipped(user.getId());
     }
 }

@@ -5,4 +5,7 @@
     <string name="facebook_app_id">120078001657651</string>
     <string name="title_activity_sign_in">SignInActivity</string>
     <string name="facebook_login">Login with Facebook</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

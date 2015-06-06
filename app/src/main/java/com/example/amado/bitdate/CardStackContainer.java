@@ -28,6 +28,7 @@ public class CardStackContainer extends RelativeLayout implements View.OnTouchLi
     private int mNextPosition;
     private CardView mFrontCard;
     private CardView mBackCard;
+    private swipeCallbacks mSwipeCallbacks;
 
 
     public CardStackContainer(Context context) {
@@ -41,6 +42,10 @@ public class CardStackContainer extends RelativeLayout implements View.OnTouchLi
     public CardStackContainer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mGestureDetector = new GestureDetector(context, new FlingListener());
+    }
+
+    public void setSwipeCallbacks(swipeCallbacks swipeCallbacks) {
+        mSwipeCallbacks = swipeCallbacks;
     }
 
     public void setAdapter(CardAdapter adapter) {
@@ -82,14 +87,34 @@ public class CardStackContainer extends RelativeLayout implements View.OnTouchLi
         bringChildToFront(mFrontCard);
     }
 
-    public void swipeRight(){
+    public void swipeRight() {
+        int position = getSwipedPosition();
         swipeCard(true);
+        if(mSwipeCallbacks!= null){
+            mSwipeCallbacks.onSwipeRight(mAdapter.getItem(position));
+        }
     }
 
 
     public void swipeLeft(){
+        int position = getSwipedPosition();
         swipeCard(false);
+        if(mSwipeCallbacks!= null){
+            mSwipeCallbacks.onSwipeLeft(mAdapter.getItem(position));
+        }
     }
+
+    private int getSwipedPosition() {
+        int position;
+        if(mBackCard != null){
+            position = mNextPosition -2;
+        }else{
+            position = mNextPosition -1;
+        }
+        return position;
+    }
+
+
 
     private void swipeCard(boolean swipeRight){
        if(swipeRight){
@@ -174,6 +199,13 @@ public class CardStackContainer extends RelativeLayout implements View.OnTouchLi
                 .setInterpolator(new AccelerateInterpolator())
                 .x(mOriginX)
                 .y(mOriginY);
+    }
+
+
+    public interface swipeCallbacks{
+        public void onSwipeRight(User user);
+        public void onSwipeLeft(User user);
+
     }
 
 

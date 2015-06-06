@@ -28,7 +28,7 @@ public class CardAdapter extends ArrayAdapter<User> {
        TextView nameView = (TextView)v.findViewById(R.id.name);
         nameView.setText(user.getFirstName());
         ImageView image = (ImageView)v.findViewById(R.id.user_photo);
-        Picasso.with(getContext()).load(user.getPictureURL()).into(image);
+        Picasso.with(getContext()).load(user.getLargePictureURL()).into(image);
         return v;
 
     }

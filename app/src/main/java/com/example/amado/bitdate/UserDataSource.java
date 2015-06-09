@@ -18,6 +18,7 @@ public class UserDataSource {
     private static final String COLUMN_FIRST_NAME= "firstName";
     private static final String COLUMN_PICTURE_URL = "pictureURL";
     private static final String COLUMN_FACEBOOK_ID = "FacebookId";
+    private static final String COLUMN_ID = "objectId";
 
 
     public static User getCurrentUser(){
@@ -27,6 +28,18 @@ public class UserDataSource {
 
         }
         return sCurrentUser;
+    }
+
+
+    public static void getUsersIn(List<String> ids, final UserDataCallbacks callbacks){
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereContainedIn(COLUMN_ID, ids);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> list, ParseException e) {
+                formatCallback(list, e, callbacks);
+            }
+        });
     }
 
     public static void getUnSeenUsers(final UserDataCallbacks callbacks){
@@ -46,22 +59,26 @@ public class UserDataSource {
                     query.findInBackground(new FindCallback<ParseUser>() {
                         @Override
                         public void done(List<ParseUser> list, ParseException e) {
-                            if(e == null) {
-                                List<User> users = new ArrayList<User>();
-                                for (ParseUser user : list){
-                                    User newUser = parseUserToUser(user);
-                                    users.add(newUser);
-                                }
-                                if(callbacks != null) {
-                                    callbacks.onUsersFetched(users);
-                                }
-                            }
+                            formatCallback(list, e, callbacks);
                         }
                     });
                 }
             }
         });
 
+    }
+
+    private static void formatCallback(List<ParseUser> list, ParseException e, UserDataCallbacks callbacks) {
+        if(e == null) {
+            List<User> users = new ArrayList<User>();
+            for (ParseUser user : list){
+                User newUser = parseUserToUser(user);
+                users.add(newUser);
+            }
+            if(callbacks != null) {
+                callbacks.onUsersFetched(users);
+            }
+        }
     }
 
 

@@ -2,6 +2,7 @@ package com.example.amado.bitdate;
 
 import android.app.Application;
 
+import com.firebase.client.Firebase;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 
@@ -12,6 +13,7 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
+        Firebase.setAndroidContext(this);
         super.onCreate();
         Parse.enableLocalDatastore(this);
 

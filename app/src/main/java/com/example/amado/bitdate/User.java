@@ -2,10 +2,12 @@ package com.example.amado.bitdate;
 
 import com.parse.ParseUser;
 
+import java.io.Serializable;
+
 /**
  * Created by Amado on 03/06/2015.
  */
-public class User {
+public class User implements Serializable{
     private String mId;
     private String mFirstName;
     private String mPictureURL;

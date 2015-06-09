@@ -6,34 +6,37 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener{
-
+    private static final int SIGN_IN_REQUEST = 0;
     private ImageView mMatchesIcon;
     private ImageView mChoosingIcon;
     private ViewPager mPager;
+    private PagerAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(UserDataSource.getCurrentUser()==null){
-            Intent i = new Intent(this, SignInActivity.class);
-            startActivity(i);
-        }
 
         mPager = (ViewPager)findViewById(R.id.pager);
-        mPager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
+        mAdapter = new PagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(this);
 
         mChoosingIcon = (ImageView)findViewById(R.id.logo_icon);
@@ -53,6 +56,30 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mChoosingIcon.setSelected(true);
         toggleColor(mChoosingIcon);
         toggleColor(mMatchesIcon);
+
+        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.tool_bar);
+
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,
+                drawerLayout, toolbar, R.string.open, R.string.close);
+        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+
+        if(UserDataSource.getCurrentUser()==null){
+            Intent i = new Intent(this, SignInActivity.class);
+            startActivityForResult(i, SIGN_IN_REQUEST);
+            return;
+        }
+
+        updateDrawer();
+    }
+
+    private void updateDrawer() {
+        ImageView photoView = (ImageView)findViewById(R.id.user_photo);
+        Picasso.with(this).load(UserDataSource.getCurrentUser().getLargePictureURL()).into(photoView);
+        TextView nameView = (TextView)findViewById(R.id.user_name);
+        nameView.setText(UserDataSource.getCurrentUser().getFirstName());
     }
 
 
@@ -126,6 +153,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         @Override
         public int getCount() {
             return 2;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == SIGN_IN_REQUEST && resultCode == RESULT_OK){
+            updateDrawer();
+            mAdapter.notifyDataSetChanged();
         }
     }
 }
